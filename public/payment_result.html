@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hello Cloudflare Pages!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background: #f0f8ff;
+        }
+        h1 {
+            color: #2c5282;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Hello Cloudflare Pages!</h1>
+    <p id="result">Loading visit count...</p>
+    
+    <script>
+        // 动态访问计数器（需配合Pages Functions使用）
+        fetch('/api/result')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('result').innerText = 
+                    `最新结果： #${data.payment_result}`;
+            });
+    </script>
+</body>
+</html>
