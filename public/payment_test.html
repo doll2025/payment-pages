@@ -272,61 +272,9 @@
                 grid-template-columns: 1fr;
             }
         }
-        
-        /* 加载指示器 */
-        .loader {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-        
-        .loader.active {
-            display: flex;
-            animation: fadeIn 0.3s;
-        }
-        
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(26, 58, 143, 0.2);
-            border-top: 5px solid #1a3a8f;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-        
-        .loader-text {
-            font-size: 1.2rem;
-            color: #1a3a8f;
-            font-weight: 500;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
     </style>
 </head>
 <body>
-    <!-- 加载指示器 -->
-    <div class="loader" id="loader">
-        <div class="spinner"></div>
-        <div class="loader-text">即将进入支付页面...</div>
-    </div>
-    
     <!-- 头部导航 -->
     <header>
         <div class="container">
@@ -459,10 +407,7 @@
             option.addEventListener('click', function() {
                 const priceId = this.getAttribute('data-price-id');
                 const remark = generateRemark();
-                // 显示加载指示器
-                const loader = document.getElementById('loader');
-                loader.classList.add('active');
-                // 立即跳转
+                // 直接跳转
                 window.location.href = `https://magicore.llc/checkout/?priceId=${priceId}&remark=${remark}`;
             });
         });
