@@ -289,7 +289,7 @@
     <div class="container">
         <div class="main-content">
             <div class="payment-options">
-                <div class="payment-option" onclick="window.location.href='https://magicore.llc/checkout/?priceId=1536&remark=2035062712060662988888888'">
+                <div class="payment-option" data-price-id="1536">
                     <div class="payment-icon">
                         <i class="fas fa-money-bill-wave"></i>
                     </div>
@@ -366,6 +366,41 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // 生成动态remark参数
+        function generateRemark() {
+            // 获取当前时间
+            const now = new Date();
+            // 格式化时间部分 (YYYYMMDDhhmmss)
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            // 获取毫秒部分并补齐3位
+            const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
+            // 时间部分（17位）：年月日时分秒毫秒
+            const timePart = `${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}`;
+            // 生成8位随机数
+            const randomPart = Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
+            // 合并为完整的remark
+            return timePart + randomPart;
+        }
+        // 处理支付选项点击
+        document.querySelectorAll('.payment-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const priceId = this.getAttribute('data-price-id');
+                const remark = generateRemark();
+                // 显示加载指示器
+                const loader = document.getElementById('loader');
+                loader.classList.add('active');
+                // 立即跳转
+                window.location.href = `https://magicore.llc/checkout/?priceId=${priceId}&remark=${remark}`;
+            });
+        });
+    </script>
     
     <!-- 底部信息 -->
     <footer>
