@@ -57,12 +57,10 @@
 
   /* ===== 提示卡片 ===== */
   .notice-wrap {
-    padding: 14px 24px 0;
+    padding: 14px 24px 12px;   /* 左右 24px，与下方 iframe 对齐 */
     flex-shrink: 0;
   }
   .notice {
-    max-width: 1200px;
-    margin: 0 auto;
     padding: 14px 18px;
     background: #fff;
     border-radius: 16px;
@@ -111,11 +109,12 @@
   .notice-warn li { display: flex; gap: 6px; align-items: flex-start; }
   .notice-warn .ico { flex-shrink: 0; line-height: 1.6; }
 
-  /* ===== iframe 区域 ===== */
+  /* ===== iframe 区域：左右内边距与提示卡片一致 ===== */
   .frame-wrap {
     flex: 1;
     position: relative;
     overflow: hidden;
+    padding: 0 24px 24px;
   }
   iframe {
     width: 100%;
@@ -123,18 +122,23 @@
     border: none;
     display: block;
     background: #fff;
+    border-radius: 16px;
+    border: 1px solid rgba(0,0,0,.05);
+    box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px -16px rgba(0,0,0,.12);
   }
 
   @media (max-width: 600px) {
     .app-bar { padding: 12px 14px; }
     .app-title { font-size: 14px; }
     .btn-pill { padding: 7px 13px; font-size: 12px; }
-    .notice-wrap { padding: 12px 14px 0; }
+    .notice-wrap { padding: 12px 14px 10px; }
     .notice { padding: 12px 14px; border-radius: 14px; gap: 8px; }
     .notice-download { font-size: 13px; gap: 8px; }
     .rocket-icon { width: 28px; height: 28px; border-radius: 8px; }
     .rocket-icon svg { width: 16px; height: 16px; }
     .notice-warn { font-size: 12px; padding: 8px 10px; }
+    .frame-wrap { padding: 0 14px 16px; }
+    iframe { border-radius: 14px; }
   }
 </style>
 </head>
