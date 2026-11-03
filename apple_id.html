@@ -4,183 +4,89 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Apple ID 共享数据</title>
-<!-- 固定版本，避免原站相对路径 CDN 404 -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
 <style>
-  :root {
-    --brand: #0071e3;
-    --brand-dark: #005bb5;
-    --bg-top: #eef3fb;
-    --bg-body: #f7f9fc;
-    --text: #1d1d1f;
-    --text-muted: #6e6e73;
-  }
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                 "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f5f5f7;
     min-height: 100vh;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI",
-                 Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-body) 260px, var(--bg-body) 100%);
-    color: var(--text);
   }
-
-  /* ===== 顶部工具栏 ===== */
-  .app-bar {
+  .toolbar {
     position: sticky; top: 0; z-index: 100;
     display: flex; align-items: center; justify-content: space-between;
-    gap: 12px; padding: 14px 24px;
-    background: rgba(255,255,255,.82);
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border-bottom: 1px solid rgba(0,0,0,.06);
+    padding: 12px 20px; background: #fff;
+    border-bottom: 1px solid #e5e5e7;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
   }
-  .app-title {
-    display: flex; align-items: center; gap: 10px;
-    font-size: 16px; font-weight: 600; letter-spacing: .01em;
+  .toolbar h1 {
+    font-size: 16px; font-weight: 600; color: #1d1d1f;
+    display: flex; align-items: center; gap: 8px;
   }
-  .badge-dot {
-    width: 9px; height: 9px; border-radius: 50%;
-    background: #34c759;
-    box-shadow: 0 0 0 4px rgba(52,199,89,.18);
-    animation: pulse 2s infinite;
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #34c759; box-shadow: 0 0 0 3px rgba(52,199,89,.2);
   }
-  @keyframes pulse {
-    0%,100% { box-shadow: 0 0 0 4px rgba(52,199,89,.18); }
-    50% { box-shadow: 0 0 0 7px rgba(52,199,89,.08); }
+  .actions { display: flex; gap: 8px; }
+  button {
+    font-size: 13px; padding: 7px 14px; border: none; border-radius: 8px;
+    cursor: pointer; font-family: inherit; transition: all .15s ease;
   }
-  .app-actions { display: flex; gap: 10px; }
-  .btn-pill {
-    appearance: none; border: 0; cursor: pointer;
-    font-size: 13px; font-weight: 600; font-family: inherit;
-    padding: 8px 16px; border-radius: 999px;
-    transition: transform .12s ease, background .15s ease, box-shadow .15s ease;
-  }
-  .btn-pill:active { transform: scale(.96); }
-  .btn-ghost { background: rgba(0,0,0,.05); color: var(--text); }
-  .btn-ghost:hover { background: rgba(0,0,0,.09); }
-  .btn-solid {
-    background: var(--brand); color: #fff;
-    box-shadow: 0 4px 14px rgba(0,113,227,.28);
-  }
-  .btn-solid:hover { background: var(--brand-dark); }
-
-  /* ===== 内容区 ===== */
-  .content-wrap {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 28px 20px 60px;
-  }
-  #content { animation: fadeUp .45s ease both; }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* 卡片网格：针对注入后的 .col-lg-3 等栅格列 */
-  #content .row { margin-left: -10px; margin-right: -10px; }
-  #content .row > [class*="col-"] {
-    padding-left: 10px; padding-right: 10px;
-    margin-bottom: 20px;
-  }
-  #content .row > [class*="col-"] > * {
-    background: #fff;
-    border-radius: 16px;
-    padding: 18px;
-    border: 1px solid rgba(0,0,0,.04);
-    box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px -12px rgba(0,0,0,.12);
-    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
-  }
-  #content .row > [class*="col-"] > *:hover {
-    transform: translateY(-3px);
-    border-color: rgba(0,113,227,.18);
-    box-shadow: 0 4px 10px rgba(0,0,0,.06), 0 18px 40px -16px rgba(0,0,0,.18);
-  }
-
-  /* 卡片内按钮圆润化 */
-  #content .btn {
-    border-radius: 999px;
-    font-size: 13px;
-    padding: 6px 14px;
-    transition: transform .12s ease;
-  }
-  #content .btn:active { transform: scale(.96); }
-  #content .btn-outline-secondary {
-    border-color: rgba(0,0,0,.14);
-    color: var(--text);
-  }
-  #content .btn-outline-secondary:hover {
-    background: var(--brand);
-    border-color: var(--brand);
-    color: #fff;
-  }
-
-  /* #idBox 说明区 */
-  #content #idBox {
-    background: #fff;
-    border-radius: 16px;
-    padding: 20px 22px;
-    margin-top: 8px;
-    border: 1px solid rgba(0,0,0,.04);
-    box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px -12px rgba(0,0,0,.12);
-  }
-  #content #idBox hr {
-    border: 0; border-top: 1px solid rgba(0,0,0,.06); margin: 14px 0;
-  }
-  #content #idBox p {
-    margin: 0; color: var(--text-muted); font-size: 14px; line-height: 1.7;
-  }
-
-  /* ===== 状态 ===== */
+  .btn-primary { background: #0071e3; color: #fff; }
+  .btn-primary:hover { background: #0077ed; }
+  .btn-secondary { background: #e8e8ed; color: #1d1d1f; }
+  .btn-secondary:hover { background: #dddde2; }
+  button:active { transform: scale(.97); }
+  #content { padding: 16px; max-width: 1200px; margin: 0 auto; }
   .state {
     display: flex; flex-direction: column; align-items: center;
-    justify-content: center; gap: 14px;
-    padding: 90px 20px; color: #86868b; font-size: 14px;
+    justify-content: center; gap: 12px; padding: 80px 20px;
+    color: #86868b; font-size: 14px;
   }
   .state.hidden { display: none; }
   .spinner {
-    width: 30px; height: 30px;
-    border: 3px solid rgba(0,0,0,.08);
-    border-top-color: var(--brand);
-    border-radius: 50%;
+    width: 28px; height: 28px; border: 3px solid #e5e5e7;
+    border-top-color: #0071e3; border-radius: 50%;
     animation: spin .8s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-
   @media (max-width: 600px) {
-    .app-bar { padding: 12px 14px; }
-    .app-title { font-size: 14px; }
-    .btn-pill { padding: 7px 13px; font-size: 12px; }
-    .content-wrap { padding: 18px 12px 40px; }
+    .toolbar { padding: 10px 14px; }
+    .toolbar h1 { font-size: 14px; }
+    button { padding: 6px 12px; font-size: 12px; }
+    #content { padding: 10px; }
   }
 </style>
 </head>
 <body>
-  <header class="app-bar">
-    <div class="app-title"><span class="badge-dot"></span>Apple ID 共享数据</div>
-    <div class="app-actions">
-      <button class="btn-pill btn-ghost" id="openBtn">新窗口打开</button>
-      <button class="btn-pill btn-solid" id="refreshBtn">刷新</button>
+  <div class="toolbar">
+    <h1><span class="dot"></span>Apple ID 共享数据</h1>
+    <div class="actions">
+      <button class="btn-secondary" id="openBtn">新窗口打开</button>
+      <button class="btn-primary" id="refreshBtn">刷新</button>
     </div>
-  </header>
+  </div>
 
-  <main class="content-wrap">
-    <div id="content"></div>
-    <div class="state" id="loadingState">
-      <div class="spinner"></div>
-      <p>正在加载数据…</p>
-    </div>
-    <div class="state hidden" id="errorState">
-      <p>加载失败，请稍后重试。</p>
-      <button class="btn-pill btn-solid" id="retryBtn">重试</button>
-    </div>
-  </main>
+  <div id="content"></div>
+
+  <div class="state" id="loadingState">
+    <div class="spinner"></div><p>正在加载数据…</p>
+  </div>
+  <div class="state hidden" id="errorState">
+    <p>加载失败，请稍后重试。</p>
+    <button class="btn-primary" id="retryBtn">重试</button>
+  </div>
 
   <script>
     const PROXY_URL = '/appleid';
     const content = document.getElementById('content');
     const loadingState = document.getElementById('loadingState');
     const errorState = document.getElementById('errorState');
+
+    // 移除上一次注入的样式，避免刷新时重复堆积
+    function clearInjectedStyles() {
+      document.querySelectorAll('[data-injected-style]').forEach(el => el.remove());
+    }
 
     async function loadContent(forceReload = false) {
       loadingState.classList.remove('hidden');
@@ -195,11 +101,19 @@
         const html = await res.text();
         const doc = new DOMParser().parseFromString(html, 'text/html');
 
-        // 关键：不再注入原页面的 <style> 和 <link>，只取 body 结构
-        // 样式统一由上面的 Bootstrap 4.6 + 自定义 CSS 接管
-        doc.querySelectorAll('script').forEach(s => s.remove());
-        doc.querySelectorAll('head style, head link[rel="stylesheet"]').forEach(s => s.remove());
+        // 1. 注入样式（去重）
+        clearInjectedStyles();
+        doc.querySelectorAll('head style, head link[rel="stylesheet"]')
+          .forEach(node => {
+            const clone = node.cloneNode(true);
+            clone.setAttribute('data-injected-style', '1');
+            document.head.appendChild(clone);
+          });
 
+        // 2. 移除 body 里的 script（innerHTML 注入本来也不会执行，清掉更干净）
+        doc.querySelectorAll('body script').forEach(s => s.remove());
+
+        // 3. 注入 body 内容
         content.innerHTML = doc.body.innerHTML;
       } catch (e) {
         console.error(e);
