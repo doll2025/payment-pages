@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Apple ID 共享数据</title>
-<!-- 固定版本，避免原站相对路径 CDN 404 -->
+<!-- 固定版本 Bootstrap，避免原站相对路径 CDN 404 -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
 <style>
   :root {
@@ -177,6 +177,7 @@
   </main>
 
   <script>
+    // ==================== 内容加载 ====================
     const PROXY_URL = '/appleid';
     const content = document.getElementById('content');
     const loadingState = document.getElementById('loadingState');
@@ -195,8 +196,7 @@
         const html = await res.text();
         const doc = new DOMParser().parseFromString(html, 'text/html');
 
-        // 关键：不再注入原页面的 <style> 和 <link>，只取 body 结构
-        // 样式统一由上面的 Bootstrap 4.6 + 自定义 CSS 接管
+        // 移除脚本与原有样式，避免与当前页面冲突
         doc.querySelectorAll('script').forEach(s => s.remove());
         doc.querySelectorAll('head style, head link[rel="stylesheet"]').forEach(s => s.remove());
 
@@ -209,6 +209,98 @@
       }
     }
 
+    // ==================== 复制功能修复 ====================
+    // 原页面脚本已被移除，onclick 引用的函数不存在；这里重新提供
+
+    async function __copy(text) {
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        // 降级方案：兼容非 HTTPS 或旧浏览器
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;top:-9999px;opacity:0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (_) {}
+        ta.remove();
+      }
+      __toast('已复制：' + text);
+    }
+
+    // 覆盖常见的全局函数名，兼容 onclick="copyText('...')" / copyText(this, '...')
+    ['copyText', 'copy', 'copyToClipboard', 'copyContent', 'copyAccount', 'copyPassword']
+      .forEach(name => {
+        window[name] = function (a, b) {
+          const text = typeof a === 'string' ? a : (typeof b === 'string' ? b : null);
+          if (text) __copy(text);
+        };
+      });
+
+    // 事件委托：处理 data-clipboard-text 和无 onclick 的复制按钮
+    document.addEventListener('click', function (e) {
+      const btn = e.target.closest('button, a.btn, .btn');
+      if (!btn) return;
+
+      // 1) data 属性直接给文本
+      const dataText = btn.getAttribute('data-clipboard-text')
+                    || btn.getAttribute('data-copy-text');
+      if (dataText) {
+        e.preventDefault();
+        __copy(dataText);
+        return;
+      }
+
+      // 2) 没有 onclick，但按钮文字包含"复制"：从卡片内提取账号/密码
+      const label = (btn.textContent || '').trim();
+      if (!btn.hasAttribute('onclick') && /复制/.test(label)) {
+        const text = __extractFromCard(btn, label);
+        if (text) {
+          e.preventDefault();
+          __copy(text);
+        }
+      }
+    });
+
+    // 从按钮所在卡片里提取"账号：xxx" / "密码：xxx" 后面的内容
+    function __extractFromCard(btn, label) {
+      const card = btn.closest('[class*="col-"]') || btn.parentElement;
+      if (!card) return null;
+      const kw = /账号/.test(label) ? '账号' : (/密码/.test(label) ? '密码' : null);
+      if (!kw) return null;
+
+      const walker = document.createTreeWalker(card, NodeFilter.SHOW_TEXT);
+      let n;
+      while ((n = walker.nextNode())) {
+        const t = n.textContent.trim();
+        const i = t.indexOf(kw);
+        if (i !== -1) {
+          const rest = t.slice(i + kw.length).replace(/^[：:\s]+/, '').trim();
+          if (rest) return rest;
+        }
+      }
+      return null;
+    }
+
+    function __toast(msg) {
+      let el = document.getElementById('__copyToast');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = '__copyToast';
+        el.style.cssText = 'position:fixed;left:50%;bottom:40px;transform:translateX(-50%);' +
+          'background:rgba(0,0,0,.85);color:#fff;padding:10px 20px;border-radius:999px;' +
+          'font-size:14px;z-index:9999;opacity:0;transition:opacity .2s;pointer-events:none;' +
+          'max-width:80vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+        document.body.appendChild(el);
+      }
+      el.textContent = msg;
+      el.style.opacity = '1';
+      clearTimeout(el.__t);
+      el.__t = setTimeout(() => { el.style.opacity = '0'; }, 1600);
+    }
+
+    // ==================== 事件绑定与初始化 ====================
     document.getElementById('refreshBtn').addEventListener('click', () => loadContent(true));
     document.getElementById('retryBtn').addEventListener('click', () => loadContent(true));
     document.getElementById('openBtn').addEventListener('click', () => {
